@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Vendas v4.2</title>
+<title>Controle de Vendas v4.3</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
@@ -16,33 +16,33 @@
 .btn-purple { background:#6f42c1; }
 .btn-teal { background:#20c997; }
 .btn-small { padding: 4px 8px; font-size: 12px; width: auto; }
- .card { background: white; padding: 12px; border-radius: 12px; margin: 12px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
- .total { font-size: 18px; font-weight: bold; }
- .linha { display: flex; justify-content: space-between; margin: 6px 0; align-items: center; }
- .liquido { background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; font-size: 18px; font-weight: bold; margin: 8px 0; }
- .liquido-pct { background: #cce5ff; color: #004085; }
- .liquido-final { background: #e7d6ff; color: #4a148c; font-size: 22px; text-align: center; }
- .config { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
- .config input { width: 80px; }
- .config.nome-input { flex: 1; min-width: 200px; }
- .row { display: flex; gap: 6px; }
- .row input,.row button { flex: 1; }
+.card { background: white; padding: 12px; border-radius: 12px; margin: 12px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.total { font-size: 18px; font-weight: bold; }
+.linha { display: flex; justify-content: space-between; margin: 6px 0; align-items: center; }
+.liquido { background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; font-size: 18px; font-weight: bold; margin: 8px 0; }
+.liquido-pct { background: #cce5ff; color: #004085; }
+.liquido-final { background: #e7d6ff; color: #4a148c; font-size: 22px; text-align: center; }
+.config { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.config input { width: 80px; }
+.config.nome-input { flex: 1; min-width: 200px; }
+.row { display: flex; gap: 6px; }
+.row input,.row button { flex: 1; }
   table { width: 100%; margin-top: 8px; border-collapse: collapse; }
   td, th { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
   th { background: #e9ecef; }
   tr:hover { background: #f8f9fa; cursor: pointer; }
- .dia-bloco { border-left: 4px solid #007bff; padding-left: 8px; margin: 12px 0; }
- .dia-titulo { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
- .dia-total { background: #e8f5e9; padding: 6px; border-radius: 6px; margin-top: 6px; font-weight: 500; }
- .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
- .modal-content { background: white; margin: 15% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
+.dia-bloco { border-left: 4px solid #007bff; padding-left: 8px; margin: 12px 0; }
+.dia-titulo { font-weight: bold; font-size: 16px; margin-bottom: 6px; }
+.dia-total { background: #e8f5e9; padding: 6px; border-radius: 6px; margin-top: 6px; font-weight: 500; }
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+.modal-content { background: white; margin: 15% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
   h2 { margin: 8px 0; }
   h3 { margin: 12px 0 6px 0; }
   label { font-weight: 500; font-size: 14px; }
 </style>
 </head>
 <body>
-<h2>Controle de Vendas v4.2</h2>
+<h2>Controle de Vendas v4.3</h2>
 
 <div class="card">
   <div class="config">
@@ -66,15 +66,6 @@
     <input type="number" id="valorVenda" placeholder="Valor R$" step="0.01">
   </div>
   <button onclick="addVenda()" class="btn-green">Adicionar Venda</button>
-</div>
-
-<div class="card">
-  <h3>Extras do Mês</h3>
-  <label>Extra Adiantado - já recebido, desconta da comissão</label>
-  <input type="number" id="extraAdiantado" placeholder="R$ 0,00" step="0.01" oninput="salvar();atualizar()">
-
-  <label style="margin-top:12px;display:block">Extra + Comissão - entra nas vendas e gera %</label>
-  <input type="number" id="extraComissao" placeholder="R$ 0,00" step="0.01" oninput="salvar();atualizar()">
 </div>
 
 <div class="card">
@@ -103,10 +94,6 @@
     <span id="totalVendas">R$ 0,00</span>
   </div>
   <div class="linha">
-    <span>Extra + Comissão:</span>
-    <span id="totalExtraCom">R$ 0,00</span>
-  </div>
-  <div class="linha">
     <span id="totalPctLabel">Comissão 8% Total:</span>
     <span id="totalPct">R$ 0,00</span>
   </div>
@@ -115,21 +102,17 @@
     <span id="totalSalario">R$ 0,00</span>
   </div>
   <div class="linha">
-    <span>Extra Adiantado:</span>
-    <span id="totalExtraAdiant">R$ 0,00</span>
-  </div>
-  <div class="linha">
     <span>Total Vales/Saídas:</span>
     <span id="totalSaidas">R$ 0,00</span>
   </div>
   <hr>
   <div class="liquido">
     LÍQUIDO VENDAS: <span id="liquidoVendas">R$ 0,00</span><br>
-    <small style="font-weight:normal">Vendas + Extra - Saídas</small>
+    <small style="font-weight:normal">Total das Vendas</small>
   </div>
   <div class="liquido liquido-pct">
     LÍQUIDO COMISSÃO: <span id="liquidoPct">R$ 0,00</span><br>
-    <small style="font-weight:normal">Comissão - Vales - Adiantado</small>
+    <small style="font-weight:normal">Comissão - Vales</small>
   </div>
   <div class="liquido liquido-final">
     TOTAL A RECEBER: <span id="totalReceber">R$ 0,00</span><br>
@@ -137,7 +120,11 @@
   </div>
 </div>
 
-<button onclick="abrirModalZerar()" class="btn-red">Zerar Mês</button>
+<div class="row">
+  <button onclick="gerarTXT()" class="btn-teal">Exportar TXT</button>
+  <button onclick="gerarPDF()" class="btn-purple">Exportar PDF</button>
+</div>
+<button onclick="abrirModalZerar()" class="btn-red" style="margin-top:8px">Zerar Mês</button>
 
 <!-- Modal Edição -->
 <div id="modal" class="modal">
@@ -168,13 +155,11 @@
 </div>
 
 <script>
-let dados = JSON.parse(localStorage.getItem('vendasMes4') || '{"vendas":[],"saidas":[],"pct":8,"nomeLoja":"","extraAdiantado":0,"extraComissao":0,"salarioFixo":0}');
+let dados = JSON.parse(localStorage.getItem('vendasMes5') || '{"vendas":[],"saidas":[],"pct":8,"nomeLoja":"","salarioFixo":0}');
 if(!dados.vendas) dados.vendas = [];
 if(!dados.saidas) dados.saidas = [];
 if(!dados.pct) dados.pct = 8;
 if(!dados.nomeLoja) dados.nomeLoja = '';
-if(!dados.extraAdiantado) dados.extraAdiantado = 0;
-if(!dados.extraComissao) dados.extraComissao = 0;
 if(!dados.salarioFixo) dados.salarioFixo = 0;
 
 let editandoTipo = null;
@@ -182,8 +167,6 @@ let editandoIdx = null;
 
 document.getElementById('pct').value = dados.pct;
 document.getElementById('nomeLoja').value = dados.nomeLoja;
-document.getElementById('extraAdiantado').value = dados.extraAdiantado || '';
-document.getElementById('extraComissao').value = dados.extraComissao || '';
 document.getElementById('salarioFixo').value = dados.salarioFixo || '';
 document.getElementById('dataVenda').valueAsDate = new Date();
 document.getElementById('dataSaida').valueAsDate = new Date();
@@ -287,21 +270,15 @@ function fecharModal(){
 function salvar(){
   dados.pct = parseFloat(document.getElementById('pct').value) || 0;
   dados.nomeLoja = document.getElementById('nomeLoja').value;
-  dados.extraAdiantado = parseFloat(document.getElementById('extraAdiantado').value) || 0;
-  dados.extraComissao = parseFloat(document.getElementById('extraComissao').value) || 0;
   dados.salarioFixo = parseFloat(document.getElementById('salarioFixo').value) || 0;
-  localStorage.setItem('vendasMes4', JSON.stringify(dados));
+  localStorage.setItem('vendasMes5', JSON.stringify(dados));
 }
 
 function atualizar(){
   dados.pct = parseFloat(document.getElementById('pct').value) || 0;
-  dados.extraAdiantado = parseFloat(document.getElementById('extraAdiantado').value) || 0;
-  dados.extraComissao = parseFloat(document.getElementById('extraComissao').value) || 0;
   dados.salarioFixo = parseFloat(document.getElementById('salarioFixo').value) || 0;
 
   document.getElementById('totalPctLabel').textContent = `Comissão ${dados.pct}% Total:`;
-  document.getElementById('totalExtraCom').textContent = formatar(dados.extraComissao);
-  document.getElementById('totalExtraAdiant').textContent = formatar(dados.extraAdiantado);
   document.getElementById('totalSalario').textContent = formatar(dados.salarioFixo);
 
   let vendasPorDia = {};
@@ -359,15 +336,15 @@ function atualizar(){
   }
   document.getElementById('listaSaidas').innerHTML = htmlSaidas;
 
-  let pctExtra = dados.extraComissao * dados.pct / 100;
-  let totalPct = (totalVendas * dados.pct / 100) + pctExtra;
+  let totalPct = totalVendas * dados.pct / 100;
 
   document.getElementById('totalVendas').textContent = formatar(totalVendas);
   document.getElementById('totalPct').textContent = formatar(totalPct);
   document.getElementById('totalSaidas').textContent = formatar(totalSaidas);
 
-  let liquidoVendas = totalVendas + dados.extraComissao - totalSaidas;
-  let liquidoPct = totalPct - totalSaidas - dados.extraAdiantado;
+  // NOVA REGRA: Saídas não afetam Líquido Vendas
+  let liquidoVendas = totalVendas;
+  let liquidoPct = totalPct - totalSaidas;
   let totalReceber = liquidoPct + dados.salarioFixo;
 
   document.getElementById('liquidoVendas').textContent = formatar(liquidoVendas);
@@ -378,7 +355,7 @@ function atualizar(){
 }
 
 function abrirModalZerar(){
-  if(dados.vendas.length === 0 && dados.saidas.length === 0 && dados.extraComissao === 0) return alert('Não há dados para zerar');
+  if(dados.vendas.length === 0 && dados.saidas.length === 0) return alert('Não há dados para zerar');
   document.getElementById('modalZerar').style.display = 'block';
 }
 
@@ -387,10 +364,8 @@ function fecharModalZerar(){
 }
 
 function zerarSemSalvar(){
-  dados = {"vendas":[],"saidas":[],"pct":8,"nomeLoja":document.getElementById('nomeLoja').value,"extraAdiantado":0,"extraComissao":0,"salarioFixo":dados.salarioFixo};
+  dados = {"vendas":[],"saidas":[],"pct":8,"nomeLoja":document.getElementById('nomeLoja').value,"salarioFixo":dados.salarioFixo};
   document.getElementById('pct').value = 8;
-  document.getElementById('extraAdiantado').value = '';
-  document.getElementById('extraComissao').value = '';
   salvar();
   atualizar();
   fecharModalZerar();
@@ -415,11 +390,10 @@ function gerarPDF(){
   const doc = new jsPDF();
 
   let totalVendas = dados.vendas.reduce((sum, v) => sum + v.valor, 0);
-  let pctExtra = dados.extraComissao * dados.pct / 100;
-  let totalPct = (totalVendas * dados.pct / 100) + pctExtra;
+  let totalPct = totalVendas * dados.pct / 100;
   let totalSaidas = dados.saidas.reduce((sum, s) => sum + s.valor, 0);
-  let liquidoVendas = totalVendas + dados.extraComissao - totalSaidas;
-  let liquidoPct = totalPct - totalSaidas - dados.extraAdiantado;
+  let liquidoVendas = totalVendas;
+  let liquidoPct = totalPct - totalSaidas;
   let totalReceber = liquidoPct + dados.salarioFixo;
 
   let dataAtual = new Date().toLocaleDateString('pt-BR');
@@ -472,13 +446,9 @@ function gerarPDF(){
   doc.setFontSize(10);
   doc.text(`Total Vendas: ${formatar(totalVendas)}`, 14, yPos);
   yPos += 6;
-  doc.text(`Extra + Comissão: ${formatar(dados.extraComissao)}`, 14, yPos);
-  yPos += 6;
   doc.text(`Comissão ${dados.pct}% Total: ${formatar(totalPct)}`, 14, yPos);
   yPos += 6;
   doc.text(`Salário Fixo: ${formatar(dados.salarioFixo)}`, 14, yPos);
-  yPos += 6;
-  doc.text(`Extra Adiantado: ${formatar(dados.extraAdiantado)}`, 14, yPos);
   yPos += 6;
   doc.text(`Total Vales/Saídas: ${formatar(totalSaidas)}`, 14, yPos);
   yPos += 10;
@@ -499,11 +469,10 @@ function gerarPDF(){
 
 function gerarTXT(){
   let totalVendas = dados.vendas.reduce((sum, v) => sum + v.valor, 0);
-  let pctExtra = dados.extraComissao * dados.pct / 100;
-  let totalPct = (totalVendas * dados.pct / 100) + pctExtra;
+  let totalPct = totalVendas * dados.pct / 100;
   let totalSaidas = dados.saidas.reduce((sum, s) => sum + s.valor, 0);
-  let liquidoVendas = totalVendas + dados.extraComissao - totalSaidas;
-  let liquidoPct = totalPct - totalSaidas - dados.extraAdiantado;
+  let liquidoVendas = totalVendas;
+  let liquidoPct = totalPct - totalSaidas;
   let totalReceber = liquidoPct + dados.salarioFixo;
 
   let dataAtual = new Date().toLocaleDateString('pt-BR');
@@ -544,10 +513,8 @@ function gerarTXT(){
   txt += `RESUMO FINANCEIRO\n`;
   txt += `=====================================\n`;
   txt += `Total Vendas: ${formatar(totalVendas)}\n`;
-  txt += `Extra + Comissão: ${formatar(dados.extraComissao)}\n`;
   txt += `Comissão ${dados.pct}% Total: ${formatar(totalPct)}\n`;
   txt += `Salário Fixo: ${formatar(dados.salarioFixo)}\n`;
-  txt += `Extra Adiantado: ${formatar(dados.extraAdiantado)}\n`;
   txt += `Total Vales/Saídas: ${formatar(totalSaidas)}\n`;
   txt += `\n`;
   txt += `LÍQUIDO VENDAS: ${formatar(liquidoVendas)}\n`;

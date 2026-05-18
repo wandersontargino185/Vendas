@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Vendas v4.3</title>
+<title>Controle de Vendas v4.4</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
@@ -22,6 +22,9 @@
 .liquido { background: #d4edda; color: #155724; padding: 12px; border-radius: 8px; font-size: 18px; font-weight: bold; margin: 8px 0; }
 .liquido-pct { background: #cce5ff; color: #004085; }
 .liquido-final { background: #e7d6ff; color: #4a148c; font-size: 22px; text-align: center; }
+.liquido-divida { background: #f8d7da; color: #721c24; }
+.liquido-restante { background: #d1ecf1; color: #0c5460; font-size: 22px; text-align: center; }
+.liquido-negativo { background: #f8d7da; color: #721c24; }
 .config { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .config input { width: 80px; }
 .config.nome-input { flex: 1; min-width: 200px; }
@@ -36,14 +39,28 @@
 .dia-total { background: #e8f5e9; padding: 6px; border-radius: 6px; margin-top: 6px; font-weight: 500; }
 .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
 .modal-content { background: white; margin: 15% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.tab-btn { flex: 1; padding: 12px; background: #e9ecef; color: #495057; border-radius: 8px; }
+.tab-btn.active { background: #007bff; color: white; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.divida-item { display: flex; gap: 6px; margin: 6px 0; align-items: center; }
+.divida-item input[type="text"] { flex: 2; }
+.divida-item input[type="number"] { flex: 1; }
   h2 { margin: 8px 0; }
   h3 { margin: 12px 0 6px 0; }
   label { font-weight: 500; font-size: 14px; }
 </style>
 </head>
 <body>
-<h2>Controle de Vendas v4.3</h2>
+<h2>Controle de Vendas v4.4</h2>
 
+<div class="tabs">
+  <button class="tab-btn active" onclick="trocarAba('vendas', this)">Vendas</button>
+  <button class="tab-btn" onclick="trocarAba('dividas', this)">Dívidas</button>
+</div>
+
+<div id="tab-vendas" class="tab-content active">
 <div class="card">
   <div class="config">
     <label><b>Loja/Vendedor:</b></label>
@@ -125,6 +142,74 @@
   <button onclick="gerarPDF()" class="btn-purple">Exportar PDF</button>
 </div>
 <button onclick="abrirModalZerar()" class="btn-red" style="margin-top:8px">Zerar Mês</button>
+</div>
+
+<div id="tab-dividas" class="tab-content">
+<div class="card">
+  <h3>Fixos</h3>
+  <div id="listaFixos"></div>
+  <button onclick="addDivida('fixos')" class="btn-green btn-small">+ Adicionar</button>
+</div>
+
+<div class="card">
+  <h3>Cartões</h3>
+  <div id="listaCartoes"></div>
+  <button onclick="addDivida('cartoes')" class="btn-green btn-small">+ Adicionar</button>
+</div>
+
+<div class="card">
+  <h3>Feira</h3>
+  <div id="listaFeira"></div>
+  <button onclick="addDivida('feira')" class="btn-green btn-small">+ Adicionar</button>
+</div>
+
+<div class="card">
+  <h3>Lazer</h3>
+  <div id="listaLazer"></div>
+  <button onclick="addDivida('lazer')" class="btn-green btn-small">+ Adicionar</button>
+</div>
+
+<div class="card">
+  <h3>Pessoas / Outros</h3>
+  <div id="listaPessoas"></div>
+  <button onclick="addDivida('pessoas')" class="btn-green btn-small">+ Adicionar</button>
+</div>
+
+<div class="card">
+  <h3>Resumo de Dívidas</h3>
+  <div class="linha">
+    <span>Fixos:</span>
+    <span id="totalFixos">R$ 0,00</span>
+  </div>
+  <div class="linha">
+    <span>Cartões:</span>
+    <span id="totalCartoes">R$ 0,00</span>
+  </div>
+  <div class="linha">
+    <span>Feira:</span>
+    <span id="totalFeira">R$ 0,00</span>
+  </div>
+  <div class="linha">
+    <span>Lazer:</span>
+    <span id="totalLazer">R$ 0,00</span>
+  </div>
+  <div class="linha">
+    <span>Pessoas/Outros:</span>
+    <span id="totalPessoas">R$ 0,00</span>
+  </div>
+  <hr>
+  <div class="liquido liquido-divida">
+    TOTAL DÍVIDAS: <span id="totalDividas">R$ 0,00</span>
+  </div>
+  <div class="liquido" style="background:#fff3cd;color:#856404">
+    TOTAL A RECEBER: <span id="totalReceberDivida">R$ 0,00</span>
+  </div>
+  <div id="blocoRestante" class="liquido liquido-restante">
+    VALOR RESTANTE: <span id="valorRestante">R$ 0,00</span><br>
+    <small style="font-weight:normal">A Receber - Dívidas</small>
+  </div>
+</div>
+</div>
 
 <!-- Modal Edição -->
 <div id="modal" class="modal">
@@ -155,15 +240,17 @@
 </div>
 
 <script>
-let dados = JSON.parse(localStorage.getItem('vendasMes5') || '{"vendas":[],"saidas":[],"pct":8,"nomeLoja":"","salarioFixo":0}');
+let dados = JSON.parse(localStorage.getItem('vendasMes6') || '{"vendas":[],"saidas":[],"pct":8,"nomeLoja":"","salarioFixo":0,"dividas":{"fixos":[],"cartoes":[],"feira":[],"lazer":[],"pessoas":[]}}');
 if(!dados.vendas) dados.vendas = [];
 if(!dados.saidas) dados.saidas = [];
 if(!dados.pct) dados.pct = 8;
 if(!dados.nomeLoja) dados.nomeLoja = '';
 if(!dados.salarioFixo) dados.salarioFixo = 0;
+if(!dados.dividas) dados.dividas = {"fixos":[],"cartoes":[],"feira":[],"lazer":[],"pessoas":[]};
 
 let editandoTipo = null;
 let editandoIdx = null;
+let abaAtual = 'vendas';
 
 document.getElementById('pct').value = dados.pct;
 document.getElementById('nomeLoja').value = dados.nomeLoja;
@@ -173,6 +260,15 @@ document.getElementById('dataSaida').valueAsDate = new Date();
 
 function formatar(n){
   return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+
+function trocarAba(aba, btn){
+  abaAtual = aba;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + aba).classList.add('active');
+  if(aba === 'dividas') atualizarDividas();
 }
 
 function addVenda(){
@@ -267,11 +363,75 @@ function fecharModal(){
   editandoIdx = null;
 }
 
+function addDivida(categoria){
+  dados.dividas[categoria].push({nome: '', valor: 0});
+  salvar();
+  atualizarDividas();
+}
+
+function removerDivida(categoria, idx){
+  dados.dividas[categoria].splice(idx, 1);
+  salvar();
+  atualizarDividas();
+}
+
+function atualizarDivida(categoria, idx, campo, valor){
+  dados.dividas[categoria][idx][campo] = campo === 'valor'? (parseFloat(valor) || 0) : valor;
+  salvar();
+  atualizarDividas();
+}
+
+function atualizarDividas(){
+  let totais = {fixos:0, cartoes:0, feira:0, lazer:0, pessoas:0};
+
+  ['fixos','cartoes','feira','lazer','pessoas'].forEach(cat => {
+    let html = '';
+    dados.dividas[cat].forEach((item, idx) => {
+      totais[cat] += item.valor || 0;
+      html += `
+      <div class="divida-item">
+        <input type="text" placeholder="Descrição" value="${item.nome}" oninput="atualizarDivida('${cat}',${idx},'nome',this.value)">
+        <input type="number" placeholder="R$ 0,00" step="0.01" value="${item.valor || ''}" oninput="atualizarDivida('${cat}',${idx},'valor',this.value)">
+        <button onclick="removerDivida('${cat}',${idx})" class="btn-red btn-small">X</button>
+      </div>`;
+    });
+    if(html === '') html = '<p style="text-align:center;color:#666;font-size:14px">Nenhum item</p>';
+    document.getElementById('lista' + cat.charAt(0).toUpperCase() + cat.slice(1)).innerHTML = html;
+    document.getElementById('total' + cat.charAt(0).toUpperCase() + cat.slice(1)).textContent = formatar(totais[cat]);
+  });
+
+  let totalDividas = totais.fixos + totais.cartoes + totais.feira + totais.lazer + totais.pessoas;
+  let totalReceber = calcularTotalReceber();
+
+  document.getElementById('totalDividas').textContent = formatar(totalDividas);
+  document.getElementById('totalReceberDivida').textContent = formatar(totalReceber);
+
+  let restante = totalReceber - totalDividas;
+  document.getElementById('valorRestante').textContent = formatar(restante);
+
+  let bloco = document.getElementById('blocoRestante');
+  if(restante < 0){
+    bloco.classList.add('liquido-negativo');
+    bloco.classList.remove('liquido-restante');
+  } else {
+    bloco.classList.remove('liquido-negativo');
+    bloco.classList.add('liquido-restante');
+  }
+}
+
+function calcularTotalReceber(){
+  let totalVendas = dados.vendas.reduce((sum, v) => sum + v.valor, 0);
+  let totalPct = totalVendas * dados.pct / 100;
+  let totalSaidas = dados.saidas.reduce((sum, s) => sum + s.valor, 0);
+  let liquidoPct = totalPct - totalSaidas;
+  return liquidoPct + dados.salarioFixo;
+}
+
 function salvar(){
   dados.pct = parseFloat(document.getElementById('pct').value) || 0;
   dados.nomeLoja = document.getElementById('nomeLoja').value;
   dados.salarioFixo = parseFloat(document.getElementById('salarioFixo').value) || 0;
-  localStorage.setItem('vendasMes5', JSON.stringify(dados));
+  localStorage.setItem('vendasMes6', JSON.stringify(dados));
 }
 
 function atualizar(){
@@ -342,7 +502,6 @@ function atualizar(){
   document.getElementById('totalPct').textContent = formatar(totalPct);
   document.getElementById('totalSaidas').textContent = formatar(totalSaidas);
 
-  // NOVA REGRA: Saídas não afetam Líquido Vendas
   let liquidoVendas = totalVendas;
   let liquidoPct = totalPct - totalSaidas;
   let totalReceber = liquidoPct + dados.salarioFixo;
@@ -352,6 +511,7 @@ function atualizar(){
   document.getElementById('totalReceber').textContent = formatar(totalReceber);
 
   salvar();
+  if(abaAtual === 'dividas') atualizarDividas();
 }
 
 function abrirModalZerar(){
@@ -364,7 +524,7 @@ function fecharModalZerar(){
 }
 
 function zerarSemSalvar(){
-  dados = {"vendas":[],"saidas":[],"pct":8,"nomeLoja":document.getElementById('nomeLoja').value,"salarioFixo":dados.salarioFixo};
+  dados = {"vendas":[],"saidas":[],"pct":8,"nomeLoja":document.getElementById('nomeLoja').value,"salarioFixo":dados.salarioFixo,"dividas":{"fixos":[],"cartoes":[],"feira":[],"lazer":[],"pessoas":[]}};
   document.getElementById('pct').value = 8;
   salvar();
   atualizar();

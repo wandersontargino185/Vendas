@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Vendas v4.4</title>
+<title>Controle de Vendas v4.5</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
@@ -53,7 +53,7 @@
 </style>
 </head>
 <body>
-<h2>Controle de Vendas v4.4</h2>
+<h2>Controle de Vendas v4.5</h2>
 
 <div class="tabs">
   <button class="tab-btn active" onclick="trocarAba('vendas', this)">Vendas</button>
@@ -378,25 +378,33 @@ function removerDivida(categoria, idx){
 function atualizarDivida(categoria, idx, campo, valor){
   dados.dividas[categoria][idx][campo] = campo === 'valor'? (parseFloat(valor) || 0) : valor;
   salvar();
-  atualizarDividas();
+  calcularTotaisDivida();
 }
 
 function atualizarDividas(){
-  let totais = {fixos:0, cartoes:0, feira:0, lazer:0, pessoas:0};
-
   ['fixos','cartoes','feira','lazer','pessoas'].forEach(cat => {
     let html = '';
     dados.dividas[cat].forEach((item, idx) => {
-      totais[cat] += item.valor || 0;
       html += `
       <div class="divida-item">
-        <input type="text" placeholder="Descrição" value="${item.nome}" oninput="atualizarDivida('${cat}',${idx},'nome',this.value)">
-        <input type="number" placeholder="R$ 0,00" step="0.01" value="${item.valor || ''}" oninput="atualizarDivida('${cat}',${idx},'valor',this.value)">
+        <input type="text" placeholder="Descrição" value="${item.nome}" onchange="atualizarDivida('${cat}',${idx},'nome',this.value)">
+        <input type="number" placeholder="R$ 0,00" step="0.01" value="${item.valor || ''}" onchange="atualizarDivida('${cat}',${idx},'valor',this.value)">
         <button onclick="removerDivida('${cat}',${idx})" class="btn-red btn-small">X</button>
       </div>`;
     });
     if(html === '') html = '<p style="text-align:center;color:#666;font-size:14px">Nenhum item</p>';
     document.getElementById('lista' + cat.charAt(0).toUpperCase() + cat.slice(1)).innerHTML = html;
+  });
+  calcularTotaisDivida();
+}
+
+function calcularTotaisDivida(){
+  let totais = {fixos:0, cartoes:0, feira:0, lazer:0, pessoas:0};
+
+  ['fixos','cartoes','feira','lazer','pessoas'].forEach(cat => {
+    dados.dividas[cat].forEach(item => {
+      totais[cat] += item.valor || 0;
+    });
     document.getElementById('total' + cat.charAt(0).toUpperCase() + cat.slice(1)).textContent = formatar(totais[cat]);
   });
 
@@ -511,7 +519,7 @@ function atualizar(){
   document.getElementById('totalReceber').textContent = formatar(totalReceber);
 
   salvar();
-  if(abaAtual === 'dividas') atualizarDividas();
+  if(abaAtual === 'dividas') calcularTotaisDivida();
 }
 
 function abrirModalZerar(){
